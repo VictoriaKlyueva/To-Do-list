@@ -51,8 +51,12 @@ p {
     font-family: "InterBold";
 }
 
-p.cases-list {
-    font-size: 24px;
+p.tasks-list {
+    font-size: 28px;
+}
+
+p.task-description {
+    font-family: "InterRegular";
 }
 
 header {
@@ -135,7 +139,7 @@ img {
     border-radius: 30px;
 }
 
-div.new-case-field {
+div.new-task-field {
     display: flex;
     margin: 25px auto 5px;
     width: 50%;
@@ -143,7 +147,7 @@ div.new-case-field {
     text-align: justify;
 }
 
-div.case-description {
+div.task-description {
     display: flex;
     margin: 0px auto 5px;
     width: 50%;
@@ -152,9 +156,9 @@ div.case-description {
     text-align: justify;
 }
 
-div.cases-list-container {
+div.tasks-list-container {
     width: 70%;
-    height: 500px;
+    height: 645px;
     padding: 30px;
     margin: 50px auto 5px;
     border-radius: 30px;
@@ -165,13 +169,13 @@ div.cases-list-container {
     border: 1px solid #24262C;
 }
 
-div.cases-divs {
+div.tasks-divs {
     margin-top: 25px;
     width: 100%;
     height: 100%;
 }
 
-div.case-div {
+div.task-div {
     display: flex;
     height: 30px;;
     margin-bottom: 10px;
@@ -184,7 +188,7 @@ div.case-div {
     justify-content: space-between;
 }
 
-div.case-info {
+div.task-info {
     display: flex;
     margin-left: 10px;;
     justify-content: space-between;
