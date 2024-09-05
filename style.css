@@ -209,3 +209,7 @@ input[type="text"] {
     font-size: 18px;
     padding-left: 1.5%;
 }
+
+input[type="text"].taskDescriptionText {
+    width: 300px;
+}

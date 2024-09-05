@@ -50,11 +50,12 @@ class Task {
         document.getElementById('task-info' + id).appendChild(taskNameP);
     
         // Создание описания дела внутри task-info
-        var taskDescriptionP = document.createElement('p');
-        taskDescriptionP.className = 'task-description';
-        taskDescriptionP.id = 'taskDescriptionP' + id;
-        taskDescriptionP.innerHTML = this.description;
-        document.getElementById('task-info' + id).appendChild(taskDescriptionP);
+        var taskDescriptionText = document.createElement('input');
+        taskDescriptionText.type = 'text';
+        taskDescriptionText.className = 'taskDescriptionText';
+        taskDescriptionText.id = 'taskDescriptionText' + id;
+        taskDescriptionText.value = this.description;
+        document.getElementById('task-info' + id).appendChild(taskDescriptionText);
     }
 }
 
