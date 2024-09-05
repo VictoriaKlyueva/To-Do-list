@@ -72,13 +72,16 @@ header {
 }
 
 button {
-    float: left;
-    width: 100%; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
     height: 100%;
-    font-family: "InterRegular";
-    font-size: 40px;
-    color: #FFFFFF;
+    width: 100%;
+    font-size: 18px;
+    padding: auto;
+    color: #989CAA;
     border-radius: 30px;
+    font-family: "InterRegular";
     border: 2px solid rgba(93, 90, 98, 1);
     background-color: rgba(93, 90, 98, 1);
 }
@@ -96,31 +99,11 @@ button:active {
 }
 
 button.add {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    width: 120%;
-    font-size: 18px;
-    padding: auto;
-    color: #989CAA;
-    border-radius: 30px;
-    border: 2px solid rgba(93, 90, 98, 1);
-    background-color: rgba(93, 90, 98, 1);
+    width: 110px;
 }
 
 button.delete {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
     width: 100px;
-    font-size: 18px;
-    padding: auto;
-    color: #989CAA;
-    border-radius: 30px;
-    border: 2px solid rgba(93, 90, 98, 1);
-    background-color: rgba(93, 90, 98, 1);
 }
 
 div.add-div {
@@ -194,6 +177,22 @@ div.task-info {
     justify-content: space-between;
     align-items: center;
     width: 50%;
+}
+
+div.filesManagement {
+    display: flex;
+    height: 50px;
+    margin: 25px auto 25px;
+    justify-content: space-between;
+    width: 30%;
+}
+
+div.save-div {
+    width: 150px;
+}
+
+div.upload-div {
+    width: 150px;
 }
 
 input[type="text"] {
