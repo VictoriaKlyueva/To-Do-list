@@ -1,15 +1,16 @@
 class Task {
     constructor(name, description='', flag=false) {
+        this.id = currentId;
         this.name = name;
         this.description = description;
         this.flag=flag;
-        this.makeTaskDiv();
+        this.div = this.makeTaskDiv();
+        currentId += 1;
     }
 
     // Создание элемента div для дела 
     makeTaskDiv() {
         let id = 'task' + currentId.toString();
-        currentId += 1;
     
         // Создание task-div
         var newTaskDiv = document.createElement('div');
@@ -36,6 +37,7 @@ class Task {
         // Создание чекбокса внутри task-info
         var checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
+        checkbox.className = 'taskCheckbox';
         checkbox.id = 'checbox' + id;
         document.getElementById('task-info' + id).appendChild(checkbox);
 
@@ -44,7 +46,7 @@ class Task {
     
         // Создание имени дела внутри task-info
         var taskNameP = document.createElement('p');
-        taskNameP.className = 'task-name';
+        taskNameP.className = 'taskName';
         taskNameP.id = 'taskName' + id;
         taskNameP.innerHTML = this.name;
         document.getElementById('task-info' + id).appendChild(taskNameP);
@@ -56,6 +58,8 @@ class Task {
         taskDescriptionText.id = 'taskDescriptionText' + id;
         taskDescriptionText.value = this.description;
         document.getElementById('task-info' + id).appendChild(taskDescriptionText);
+
+        return newTaskDiv;
     }
 }
 
@@ -70,7 +74,8 @@ function addTask() {
 
     // Создание дела с обработкой их количества
     if (count < 10) {
-        new Task(taskName, taskDescription);
+        let newTask = new Task(taskName, taskDescription);
+        tasks.push(newTask);
         count += 1;
     }
     else {
@@ -80,16 +85,38 @@ function addTask() {
     // Очистка текстовых полей
     inputName.value = "";
     inputDescription.value = "";
+
+    console.log(tasks);
 }
 
 // Удаление элемента из списка
 function deleteTask(id) {
+    // Удаление div
     var task = document.getElementById(id);
     task.remove();
+
+    // Удаление элемента из списка
+    for (let i = 0; i < tasks.length; i++) {
+        let current = 'task' + tasks[i].id.toString();
+        console.log(current);
+        if (current == id) {
+            tasks.splice(i, 1);
+            break;
+        }
+    }
+
     count -= 1;
+
+    console.log(tasks);
+}
+
+// Сохранение списка
+function saveTasks() {
+    
 }
 
 document.getElementById('add').onclick = addTask;
 
 var count = 0;
-var currentId = 0
+var currentId = 0;
+var tasks = [];
