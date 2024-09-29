@@ -37,10 +37,11 @@ function makeTaskDiv(task) {
     checkbox.type = 'checkbox';
     checkbox.className = 'taskCheckbox';
     checkbox.id = 'checbox' + id;
+    checkbox.checked = task.isCompleted
     document.getElementById('task-info' + id).appendChild(checkbox);
 
     // Замена состояния flag при нажатии на чекбокс
-    checkbox.onclick = () => {changeFlag()};
+    checkbox.onclick = () => {changeFlag(task)};
 
     // Создание имени дела внутри task-info
     var taskDescriptionP = document.createElement('p');
@@ -48,6 +49,50 @@ function makeTaskDiv(task) {
     taskDescriptionP.id = 'taskName' + id;
     taskDescriptionP.innerHTML = task.description;
     document.getElementById('task-info' + id).appendChild(taskDescriptionP);
+}
+
+function changeFlag(task) {
+    if (task.isCompleted) {
+        fetch('https://localhost:7067/api/todo/incomplete/' + task.id.toString(), {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Дело теперь не выполнено', data);
+            updateTasksList();
+        })
+        .catch((error) => {
+            console.error('Ошибка:', error);
+        });
+    } else {
+        fetch('https://localhost:7067/api/todo/complete/' + task.id.toString(), {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Дело теперь выполнено', data);
+            updateTasksList();
+        })
+        .catch((error) => {
+            console.error('Ошибка:', error);
+        });
+    }
 }
 
 // Добавление дела
@@ -74,7 +119,7 @@ function addTask() {
             return response.json();
         })
         .then(data => {
-            console.log('Дело успешно добавлено:', data);
+            console.log('Дело успешно добавлено');
             updateTasksList();
         })
         .catch((error) => {
@@ -128,7 +173,7 @@ function updateTasksList() {
     fetchTasks()
         .then(receivedTasks => {
             if (receivedTasks) {
-                tasks = receivedTasks;
+                tasks = receivedTasks.sort((a, b) => a.id - b.id);
                 makeDivs();
             } else {
                 console.log("Не удалось получить задачи.");
@@ -154,7 +199,7 @@ function deleteTask(id) {
         return response.json();
     })
     .then(data => {
-        console.log('Дело успешно удалено', data);
+        console.log('Дело успешно удалено');
         updateTasksList();
     })
     .catch((error) => {
