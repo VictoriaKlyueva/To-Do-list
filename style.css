@@ -55,8 +55,8 @@ p.tasks-list {
     font-size: 28px;
 }
 
-p.task-description {
-    font-family: "InterRegular";
+p.taskName {
+    margin-left: 10px;
 }
 
 header {
@@ -173,8 +173,7 @@ div.task-div {
 
 div.task-info {
     display: flex;
-    margin-left: 10px;;
-    justify-content: space-between;
+    margin-left: 10px;
     align-items: center;
     width: 50%;
 }
