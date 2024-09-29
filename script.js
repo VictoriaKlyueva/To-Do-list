@@ -1,17 +1,14 @@
 class Task {
-    constructor(name, description='', flag=false) {
-        this.id = currentId;
-        this.name = name;
-        this.description = description;
-        this.flag = flag;
-        this.div = makeTaskDiv(this);
-        currentId += 1;
+    constructor(Description, IsCompleted=false) {
+        this.Id;
+        this.Description = Description;
+        this.IsCompleted = IsCompleted;
     }
 }
 
 // Создание элемента div для дела 
 function makeTaskDiv(task) {
-    let id = 'task' + currentId.toString();
+    let id = 'task' + task.id.toString();
 
     // Создание task-div
     var newTaskDiv = document.createElement('div');
@@ -43,71 +40,107 @@ function makeTaskDiv(task) {
     document.getElementById('task-info' + id).appendChild(checkbox);
 
     // Замена состояния flag при нажатии на чекбокс
-    checkbox.onclick = () => {task.flag = !task.flag};
+    checkbox.onclick = () => {changeFlag()};
 
     // Создание имени дела внутри task-info
-    var taskNameP = document.createElement('p');
-    taskNameP.className = 'taskName';
-    taskNameP.id = 'taskName' + id;
-    taskNameP.innerHTML = task.name;
-    document.getElementById('task-info' + id).appendChild(taskNameP);
-
-    // Создание описания дела внутри task-info
-    var taskDescriptionText = document.createElement('input');
-    taskDescriptionText.type = 'text';
-    taskDescriptionText.className = 'taskDescriptionText';
-    taskDescriptionText.id = 'taskDescriptionText' + id;
-    taskDescriptionText.value = task.description;
-    document.getElementById('task-info' + id).appendChild(taskDescriptionText);
-
-    currentId += 1;
+    var taskDescriptionP = document.createElement('p');
+    taskDescriptionP.className = 'taskName';
+    taskDescriptionP.id = 'taskName' + id;
+    taskDescriptionP.innerHTML = task.description;
+    document.getElementById('task-info' + id).appendChild(taskDescriptionP);
 }
 
 // Добавление дела
 function addTask() {
+    // Получение текста из полейa
     let inputName = document.querySelector('input[name="taskInput"]');
-    let inputDescription = document.querySelector('input[name="taskDescription"]');
-
-    // Получение текста из полей
     let taskName = inputName.value;
-    let taskDescription = inputDescription.value;
 
     // Создание дела с обработкой их количества
-    if (count < 10) {
-        let newTask = new Task(taskName, taskDescription);
-        tasks.push(newTask);
-        count += 1;
-    }
-    else {
+    if (tasks.length < 10) {
+        let newTask = new Task(taskName);
+
+        fetch('https://localhost:7067/api/todo', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newTask),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Дело успешно добавлено:', data);
+            updateTasksList();
+        })
+        .catch((error) => {
+            console.error('Ошибка:', error);
+        });
+    } else {
         window.alert('Слишком много дел. Отдохните :)');
     }
 
     // Очистка текстовых полей
     inputName.value = "";
-    inputDescription.value = "";
+}
 
-    console.log(tasks);
+function fetchTasks() {
+    return fetch('https://localhost:7067/api/todo', { // добавлен return
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .catch(error => {
+        console.error('Ошибка при получении задач:', error);
+        throw error;
+    });
+}
+
+function deleteAllTasksDivs() {
+    // Очистка списка дел
+    document.querySelector('.tasks-divs').innerHTML = '';
+}
+
+function makeDivs() {
+    // Создание дивов для задач
+    tasks.forEach(item => {
+        makeTaskDiv(item);
+    });
+}
+
+function updateTasksList() {
+    // Удаление старых divов задач
+    deleteAllTasksDivs()
+    
+    // Получение списка дел из бд
+    fetchTasks()
+        .then(receivedTasks => {
+            if (receivedTasks) {
+                tasks = receivedTasks;
+                makeDivs();
+            } else {
+                console.log("Не удалось получить задачи.");
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка при обработке задач:', error);
+        });
 }
 
 // Удаление элемента из списка
-function deleteTask(id) {
-    // Удаление div
-    var task = document.getElementById(id);
-    task.remove();
-
-    // Удаление элемента из списка
-    for (let i = 0; i < tasks.length; i++) {
-        let current = 'task' + tasks[i].id.toString();
-        console.log(current);
-        if (current == id) {
-            tasks.splice(i, 1);
-            break;
-        }
-    }
-
-    count -= 1;
-
-    console.log(tasks);
+function deleteTask(task) {
+    x
 }
 
 // Сохранение списка
@@ -125,7 +158,6 @@ function saveTasks() {
 function uploadTasks() {
     // Очистка списка дел
     document.querySelector('.tasks-divs').innerHTML = '';
-    count = 0;
 
     const file = document.getElementById('upload').files[0]; // получаем выбранный файл
     const reader = new FileReader();
@@ -134,9 +166,7 @@ function uploadTasks() {
         const content = e.target.result;
         tasks = JSON.parse(content);
 
-        console.log(tasks);
         tasks.forEach(item => {
-            console.log(item);
             makeTaskDiv(item);
         })
     };
@@ -144,12 +174,14 @@ function uploadTasks() {
     reader.readAsText(file);
 }
 
-document.getElementById('upload').addEventListener('change', uploadTasks);
-
 document.getElementById('add').onclick = addTask;
 document.getElementById('save').onclick = saveTasks;
 document.getElementById('upload').addEventListener('change', uploadTasks);
 
-var count = 0;
-var currentId = 0;
 var tasks = [];
+
+// При обновлении страницы
+function codeAddress() {
+    updateTasksList();
+}
+window.onload = codeAddress;
