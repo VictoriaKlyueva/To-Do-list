@@ -107,18 +107,19 @@ function fetchTasks() {
     });
 }
 
+// Очистка списка дел
 function deleteAllTasksDivs() {
-    // Очистка списка дел
     document.querySelector('.tasks-divs').innerHTML = '';
 }
 
+// Создание дивов для задач
 function makeDivs() {
-    // Создание дивов для задач
     tasks.forEach(item => {
         makeTaskDiv(item);
     });
 }
 
+// Обновление всего списка дел
 function updateTasksList() {
     // Удаление старых divов задач
     deleteAllTasksDivs()
@@ -140,8 +141,6 @@ function updateTasksList() {
 
 // Удаление элемента из списка
 function deleteTask(id) {
-    console.log("ID дела:", id);
-
     fetch('https://localhost:7067/api/todo/' + id.toString(), {
         method: 'DELETE',
         headers: {
