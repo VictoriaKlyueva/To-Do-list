@@ -43,12 +43,13 @@ function makeTaskDiv(task) {
     // Замена состояния flag при нажатии на чекбокс
     checkbox.onclick = () => {changeFlag(task)};
 
-    // Создание имени дела внутри task-info
-    var taskDescriptionP = document.createElement('p');
-    taskDescriptionP.className = 'taskName';
-    taskDescriptionP.id = 'taskName' + id;
-    taskDescriptionP.innerHTML = task.description;
-    document.getElementById('task-info' + id).appendChild(taskDescriptionP);
+    // Создание имени дела дела внутри task-info
+    var taskDescriptionText = document.createElement('input');
+    taskDescriptionText.type = 'text';
+    taskDescriptionText.className = 'taskDescriptionText';
+    taskDescriptionText.id = 'taskDescriptionText' + id;
+    taskDescriptionText.value = task.description;
+    document.getElementById('task-info' + id).appendChild(taskDescriptionText);
 }
 
 function changeFlag(task) {
@@ -158,6 +159,42 @@ function deleteAllTasksDivs() {
 function makeDivs() {
     tasks.forEach(item => {
         makeTaskDiv(item);
+    });
+}
+
+// Изменение описания дела
+function changeTaskDescription(task) {
+    console.log(document.getElementById('taskDescriptionTexttask' + task.id.toString()).value);
+    console.log(JSON.stringify({DescriptionName: 
+        document.getElementById('taskDescriptionTexttask' + task.id.toString()).value
+    }));
+
+    fetch('https://localhost:7067/api/todo/' + task.id.toString(), {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({DescriptionName: 
+            document.getElementById('taskDescriptionTexttask' + task.id.toString()).value
+        })
+    })
+    .then(data => {
+        console.log("Вроде чето поменялось");
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .catch((error) => {
+        console.error('Ошибка:', error);
+    });
+}
+
+function changeAllDescriptions() {
+    tasks.forEach(item => {
+        changeTaskDescription(item);
     });
 }
 

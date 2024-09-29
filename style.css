@@ -209,5 +209,6 @@ input[type="text"] {
 }
 
 input[type="text"].taskDescriptionText {
+    margin-left: 10px;
     width: 300px;
 }
