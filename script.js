@@ -66,7 +66,6 @@ function changeFlag(task) {
             return response.json();
         })
         .then(data => {
-            console.log('Дело теперь не выполнено', data);
             updateTasksList();
         })
         .catch((error) => {
@@ -86,7 +85,6 @@ function changeFlag(task) {
             return response.json();
         })
         .then(data => {
-            console.log('Дело теперь выполнено', data);
             updateTasksList();
         })
         .catch((error) => {
@@ -119,7 +117,6 @@ function addTask() {
             return response.json();
         })
         .then(data => {
-            console.log('Дело успешно добавлено');
             updateTasksList();
         })
         .catch((error) => {
@@ -176,7 +173,7 @@ function updateTasksList() {
                 tasks = receivedTasks.sort((a, b) => a.id - b.id);
                 makeDivs();
             } else {
-                console.log("Не удалось получить задачи.");
+                console.log("Не удалось получить задачи");
             }
         })
         .catch(error => {
@@ -207,40 +204,7 @@ function deleteTask(id) {
     });
 }
 
-// Сохранение списка
-function saveTasks() {
-    const blob = new Blob([JSON.stringify(tasks, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob); 
-    const a = document.createElement('a'); 
-    a.href = url;
-    a.download = 'tasks.json'; 
-    document.body.appendChild(a);
-    a.click();
-}
-
-// Загрузка списка
-function uploadTasks() {
-    // Очистка списка дел
-    document.querySelector('.tasks-divs').innerHTML = '';
-
-    const file = document.getElementById('upload').files[0]; // получаем выбранный файл
-    const reader = new FileReader();
-
-    reader.onload = function(e) {
-        const content = e.target.result;
-        tasks = JSON.parse(content);
-
-        tasks.forEach(item => {
-            makeTaskDiv(item);
-        })
-    };
-
-    reader.readAsText(file);
-}
-
 document.getElementById('add').onclick = addTask;
-document.getElementById('save').onclick = saveTasks;
-document.getElementById('upload').addEventListener('change', uploadTasks);
 
 var tasks = [];
 
