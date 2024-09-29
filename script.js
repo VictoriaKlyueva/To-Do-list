@@ -30,7 +30,7 @@ function makeTaskDiv(task) {
     document.getElementById(id).appendChild(deleteButton);
 
     // Удаление дела по нажатию на кнопку
-    deleteButton.onclick = function() {deleteTask(id)}
+    deleteButton.onclick = function() {deleteTask(task.id)}
 
     // Создание чекбокса внутри task-info
     var checkbox = document.createElement('input');
@@ -139,8 +139,28 @@ function updateTasksList() {
 }
 
 // Удаление элемента из списка
-function deleteTask(task) {
-    x
+function deleteTask(id) {
+    console.log("ID дела:", id);
+
+    fetch('https://localhost:7067/api/todo/' + id.toString(), {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Дело успешно удалено', data);
+        updateTasksList();
+    })
+    .catch((error) => {
+        console.error('Ошибка:', error);
+    });
 }
 
 // Сохранение списка
