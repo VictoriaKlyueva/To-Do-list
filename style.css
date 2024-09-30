@@ -214,7 +214,6 @@ input[type="text"] {
 
 input[type="text"].taskDescriptionText {
     margin-left: 20px;
-    width: 1000px;
     height: 110%;
     padding-left: 10px;
 }
