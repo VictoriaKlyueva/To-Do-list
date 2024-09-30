@@ -179,7 +179,7 @@ div.task-info {
     display: flex;
     margin-left: 10px;
     align-items: center;
-    width: 50%;
+    width: 70%;
 }
 
 div.filesManagement {
@@ -213,8 +213,8 @@ input[type="text"] {
 }
 
 input[type="text"].taskDescriptionText {
-    margin-left: 10px;
-    width: 300px;
+    margin-left: 20px;
+    width: 1000px;
     height: 110%;
     padding-left: 10px;
 }
