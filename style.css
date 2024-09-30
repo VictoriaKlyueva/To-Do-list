@@ -106,6 +106,10 @@ button.delete {
     width: 100px;
 }
 
+button.update {
+    width: 100px;
+}
+
 div.add-div {
     margin-left: 15px;
 }
@@ -211,4 +215,6 @@ input[type="text"] {
 input[type="text"].taskDescriptionText {
     margin-left: 10px;
     width: 300px;
+    height: 110%;
+    padding-left: 10px;
 }

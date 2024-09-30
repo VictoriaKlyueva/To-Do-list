@@ -22,6 +22,13 @@ function makeTaskDiv(task) {
     taskInfoDiv.id = 'task-info' + id;
     document.getElementById(id).appendChild(taskInfoDiv);
 
+    // Создание кнопки "Изменить" внутри task-div
+    var updateButton = document.createElement('button');
+    updateButton.className = 'update';
+    updateButton.id = 'update' + id;
+    updateButton.innerHTML = 'Изменить';
+    document.getElementById(id).appendChild(updateButton);
+
     // Создание кнопки "Удалить" внутри task-div
     var deleteButton = document.createElement('button');
     deleteButton.className = 'delete';
@@ -50,6 +57,9 @@ function makeTaskDiv(task) {
     taskDescriptionText.id = 'taskDescriptionText' + id;
     taskDescriptionText.value = task.description;
     document.getElementById('task-info' + id).appendChild(taskDescriptionText);
+
+    // Изменение дела по нажатию на кнопку
+    updateButton.onclick = function() {changeTaskDescription(task.id, taskDescriptionText.value)}
 }
 
 function changeFlag(task) {
@@ -163,38 +173,21 @@ function makeDivs() {
 }
 
 // Изменение описания дела
-function changeTaskDescription(task) {
-    console.log(document.getElementById('taskDescriptionTexttask' + task.id.toString()).value);
-    console.log(JSON.stringify({DescriptionName: 
-        document.getElementById('taskDescriptionTexttask' + task.id.toString()).value
-    }));
-
-    fetch('https://localhost:7067/api/todo/' + task.id.toString(), {
+function changeTaskDescription(id, description) {
+    console.log(description);
+    console.log(JSON.stringify({ DescriptionName: description }));
+    fetch('https://localhost:7067/api/todo/' + id.toString(), {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({DescriptionName: 
-            document.getElementById('taskDescriptionTexttask' + task.id.toString()).value
-        })
+        body: JSON.stringify({ DescriptionName: description })
     })
     .then(data => {
         console.log("Вроде чето поменялось");
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
     .catch((error) => {
         console.error('Ошибка:', error);
-    });
-}
-
-function changeAllDescriptions() {
-    tasks.forEach(item => {
-        changeTaskDescription(item);
     });
 }
 
