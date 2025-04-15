@@ -64,7 +64,7 @@ function makeTaskDiv(task) {
 
 function changeFlag(task) {
     if (task.isCompleted) {
-        fetch('https://localhost:7067/api/todo/incomplete/' + task.id.toString(), {
+        fetch('http://192.168.232.82:5259/api/todo/incomplete/' + task.id.toString(), {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -83,7 +83,7 @@ function changeFlag(task) {
             console.error('Ошибка:', error);
         });
     } else {
-        fetch('https://localhost:7067/api/todo/complete/' + task.id.toString(), {
+        fetch('http://192.168.232.82:5259/api/todo/complete/' + task.id.toString(), {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -114,7 +114,7 @@ function addTask() {
     if (tasks.length < 10) {
         let newTask = new Task(taskName);
 
-        fetch('https://localhost:7067/api/todo', {
+        fetch('http://192.168.232.82:5259/api/todo', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -142,7 +142,7 @@ function addTask() {
 }
 
 function fetchTasks() {
-    return fetch('https://localhost:7067/api/todo', { // добавлен return
+    return fetch('http://192.168.232.82:5259/api/todo', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -176,7 +176,7 @@ function makeDivs() {
 function changeTaskDescription(id, description) {
     console.log(description);
     console.log(JSON.stringify({ DescriptionName: description }));
-    fetch('https://localhost:7067/api/todo/' + id.toString(), {
+    fetch('http://192.168.232.82:5259/api/todo/' + id.toString(), {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -213,7 +213,7 @@ function updateTasksList() {
 
 // Удаление элемента из списка
 function deleteTask(id) {
-    fetch('https://localhost:7067/api/todo/' + id.toString(), {
+    fetch('http://192.168.232.82:5259/api/todo/' + id.toString(), {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
