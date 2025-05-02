@@ -1,221 +1,312 @@
-let apiUrl = "http://localhost:5055/api/todo";
+const apiUrl = "http://localhost:5055/api/todo";
+let currentEditingTask = null;
 
-class Task {
-    constructor(title, description = "", deadline = null, priority = "Medium") {
-        this.title = title;
-        this.description = description;
-        this.deadline = deadline;
-        this.priority = priority;
+// DOM элементы
+const modal = document.getElementById('edit-modal');
+const taskInput = document.querySelector('.task-form__input');
+const tasksContainer = document.getElementById('tasks-container');
+const addButton = document.getElementById('add');
+const saveButton = document.getElementById('save-changes');
+const closeButton = document.querySelector('.modal__close');
+
+// Инициализация при загрузке страницы
+document.addEventListener('DOMContentLoaded', () => {
+  addButton.addEventListener('click', addTask);
+  closeButton.addEventListener('click', closeModal);
+  saveButton.addEventListener('click', saveTaskChanges);
+  
+  // Закрытие модального окна при клике вне его
+  window.addEventListener('click', (event) => {
+    if (event.target === modal) {
+      closeModal();
     }
+  });
+  
+  updateTasksList();
+});
+
+// Класс задачи
+class Task {
+  constructor(title, description = "", deadline = null, priority = "Medium") {
+    this.title = title;
+    this.description = description;
+    this.deadline = deadline;
+    this.priority = priority;
+  }
 }
 
 // Создание элемента задачи
 function createTaskElement(task) {
-    let taskDiv = document.createElement('div');
-    taskDiv.className = 'task-div';
-    taskDiv.id = `task-${task.id}`;
-    taskDiv.dataset.priority = task.priority.toLowerCase();
+  const taskElement = document.createElement('div');
+  taskElement.className = `task-card task-card--${task.priority.toLowerCase()}`;
+  taskElement.dataset.id = task.id;
 
-    // Чекбокс выполнения
-    let checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.className = 'task-checkbox';
-    checkbox.checked = task.status === 'Completed' || task.status === 'Late';
-    checkbox.onclick = () => toggleTaskCompletion(task);
+  // Чекбокс выполнения
+  const checkbox = document.createElement('input');
+  checkbox.type = 'checkbox';
+  checkbox.className = 'task-checkbox';
+  checkbox.checked = task.status === 'Completed' || task.status === 'Late';
+  checkbox.addEventListener('change', () => toggleTaskCompletion(task));
 
-    // Основная информация о задаче
-    let taskInfo = document.createElement('div');
-    taskInfo.className = 'task-info';
+  // Заголовок задачи
+  const title = document.createElement('div');
+  title.className = 'task-title';
+  title.textContent = task.title;
 
-    let titleInput = document.createElement('input');
-    titleInput.type = 'text';
-    titleInput.className = 'task-title';
-    titleInput.value = task.title;
-    
-    let descriptionInput = document.createElement('input');
-    descriptionInput.type = 'text';
-    descriptionInput.className = 'task-description';
-    descriptionInput.value = task.description || '';
-    
-    let deadlineInput = document.createElement('input');
-    deadlineInput.type = 'datetime-local';
-    deadlineInput.className = 'task-deadline';
-    if (task.deadline) {
-        deadlineInput.value = new Date(task.deadline).toISOString().slice(0, 16);
-    }
+  // Описание задачи
+  const description = document.createElement('p');
+  description.className = 'task-description';
+  description.textContent = task.description || '';
 
-    // Приоритет
-    let prioritySelect = document.createElement('select');
-    prioritySelect.className = 'task-priority';
-    ['Low', 'Medium', 'High', 'Critical'].forEach(priority => {
-        let option = document.createElement('option');
-        option.value = priority;
-        option.textContent = priority;
-        option.selected = task.priority === priority;
-        prioritySelect.appendChild(option);
-    });
+  // Мета-информация
+  const meta = document.createElement('div');
+  meta.className = 'task-meta';
 
-    // Кнопки управления
-    let updateBtn = document.createElement('button');
-    updateBtn.className = 'update-btn';
-    updateBtn.textContent = 'Обновить';
-    updateBtn.onclick = () => updateTask(task.id, {
-        title: titleInput.value,
-        description: descriptionInput.value,
-        deadline: deadlineInput.value ? new Date(deadlineInput.value) : null,
-        priority: prioritySelect.value
-    });
+  // Дедлайн
+  const deadline = document.createElement('div');
+  deadline.className = 'task-deadline';
+  deadline.innerHTML = `<i class="far fa-calendar-alt"></i> ${task.deadline 
+    ? new Date(task.deadline).toLocaleString() 
+    : 'Без дедлайна'}`;
 
-    let deleteBtn = document.createElement('button');
-    deleteBtn.className = 'delete-btn';
-    deleteBtn.textContent = 'Удалить';
-    deleteBtn.onclick = () => deleteTask(task.id);
+  // Приоритет
+  const priority = document.createElement('div');
+  priority.className = 'task-priority';
+  priority.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${getPriorityName(task.priority)}`;
 
-    // Сборка элемента
-    taskInfo.append(
-        checkbox,
-        titleInput,
-        descriptionInput,
-        deadlineInput,
-        prioritySelect
-    );
-    
-    taskDiv.append(
-        taskInfo,
-        updateBtn,
-        deleteBtn
-    );
+  // Статус
+  const status = document.createElement('div');
+  status.className = `task-status task-status--${task.status.toLowerCase()}`;
+  status.innerHTML = `<i class="fas fa-info-circle"></i> ${getStatusName(task.status)}`;
 
-    return taskDiv;
+  // Кнопки действий
+  const actions = document.createElement('div');
+  actions.className = 'task-actions';
+
+  const editButton = document.createElement('button');
+  editButton.className = 'task-button task-button--edit';
+  editButton.innerHTML = '<i class="fas fa-edit"></i> Редактировать';
+  editButton.addEventListener('click', () => openEditModal(task));
+
+  const deleteButton = document.createElement('button');
+  deleteButton.className = 'task-button task-button--delete';
+  deleteButton.innerHTML = '<i class="fas fa-trash-alt"></i> Удалить';
+  deleteButton.addEventListener('click', () => deleteTask(task.id));
+
+  // Сборка элементов
+  meta.append(deadline, priority, status);
+  actions.append(editButton, deleteButton);
+  
+  const header = document.createElement('div');
+  header.className = 'task-header';
+  header.append(checkbox, title);
+
+  taskElement.append(header, description, meta, actions);
+
+  return taskElement;
+}
+
+// Открытие модального окна редактирования
+function openEditModal(task) {
+  currentEditingTask = task;
+  
+  document.getElementById('edit-title').value = task.title;
+  document.getElementById('edit-description').value = task.description || '';
+  document.getElementById('edit-deadline').value = task.deadline 
+    ? new Date(task.deadline).toISOString().slice(0, 16) 
+    : '';
+  document.getElementById('edit-priority').value = task.priority;
+  
+  modal.style.display = 'flex';
+}
+
+// Закрытие модального окна
+function closeModal() {
+  modal.style.display = 'none';
+  currentEditingTask = null;
+}
+
+// Сохранение изменений задачи
+function saveTaskChanges() {
+  if (!currentEditingTask) return;
+  
+  const updatedTask = {
+    title: document.getElementById('edit-title').value,
+    description: document.getElementById('edit-description').value,
+    deadline: document.getElementById('edit-deadline').value 
+      ? new Date(document.getElementById('edit-deadline').value)
+      : null,
+    priority: document.getElementById('edit-priority').value
+  };
+  
+  updateTask(currentEditingTask.id, updatedTask);
+  closeModal();
 }
 
 // Добавление новой задачи
 async function addTask() {
-    const titleInput = document.querySelector('input[name="taskInput"]');
-    const title = titleInput.value.trim();
+  const title = taskInput.value.trim();
+  
+  if (!title || title.length < 4) {
+    showAlert('Название задачи обязательно и должно содержать минимум 4 символа', 'error');
+    return;
+  }
+
+  try {
+    const newTask = new Task(title);
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newTask)
+    });
+
+    if (!response.ok) throw new Error('Ошибка при создании задачи');
     
-    if (!title || title.length < 4) {
-        alert('Название задачи обязательно и должно содержать минимум 4 символа');
-        return;
-    }
-
-    try {
-        const newTask = new Task(title);
-        const response = await fetch(apiUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(newTask)
-        });
-
-        if (!response.ok) throw new Error('Ошибка при создании задачи');
-        
-        await updateTasksList();
-        titleInput.value = '';
-    } catch (error) {
-        console.error('Ошибка:', error);
-        alert('Не удалось создать задачу');
-    }
+    await updateTasksList();
+    taskInput.value = '';
+    showAlert('Задача успешно добавлена', 'success');
+  } catch (error) {
+    console.error('Ошибка:', error);
+    showAlert('Не удалось создать задачу', 'error');
+  }
 }
 
 // Обновление задачи
 async function updateTask(id, updatedData) {
-    try {
-        const response = await fetch(`${apiUrl}/${id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(updatedData)
-        });
+  try {
+    const response = await fetch(`${apiUrl}/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updatedData)
+    });
 
-        if (!response.ok) throw new Error('Ошибка при обновлении задачи');
-        
-        await updateTasksList();
-    } catch (error) {
-        console.error('Ошибка:', error);
-        alert('Не удалось обновить задачу');
-    }
+    if (!response.ok) throw new Error('Ошибка при обновлении задачи');
+    
+    await updateTasksList();
+    showAlert('Задача успешно обновлена', 'success');
+  } catch (error) {
+    console.error('Ошибка:', error);
+    showAlert('Не удалось обновить задачу', 'error');
+  }
 }
 
 // Переключение статуса выполнения
 async function toggleTaskCompletion(task) {
-    try {
-        const endpoint = task.status === 'Completed' || task.status === 'Late' 
-            ? 'incomplete' 
-            : 'complete';
-        
-        const response = await fetch(`${apiUrl}/${endpoint}/${task.id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        });
+  try {
+    const endpoint = task.status === 'Completed' || task.status === 'Late' 
+      ? 'incomplete' 
+      : 'complete';
+    
+    const response = await fetch(`${apiUrl}/${endpoint}/${task.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
 
-        if (!response.ok) throw new Error('Ошибка при изменении статуса');
-        
-        await updateTasksList();
-    } catch (error) {
-        console.error('Ошибка:', error);
-    }
+    if (!response.ok) throw new Error('Ошибка при изменении статуса');
+    
+    await updateTasksList();
+  } catch (error) {
+    console.error('Ошибка:', error);
+    showAlert('Не удалось изменить статус задачи', 'error');
+  }
 }
 
 // Удаление задачи
 async function deleteTask(id) {
-    try {
-        const response = await fetch(`${apiUrl}/${id}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        });
+  try {
+    const response = await fetch(`${apiUrl}/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
 
-        if (!response.ok) throw new Error('Ошибка при удалении задачи');
-        
-        await updateTasksList();
-    } catch (error) {
-        console.error('Ошибка:', error);
-        alert('Не удалось удалить задачу');
-    }
+    if (!response.ok) throw new Error('Ошибка при удалении задачи');
+    
+    await updateTasksList();
+    showAlert('Задача успешно удалена', 'success');
+  } catch (error) {
+    console.error('Ошибка:', error);
+    showAlert('Не удалось удалить задачу', 'error');
+  }
 }
 
 // Получение списка задач
 async function fetchTasks() {
-    try {
-        const response = await fetch(apiUrl, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        });
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
 
-        if (!response.ok) throw new Error('Ошибка при получении задач');
-        
-        return await response.json();
-    } catch (error) {
-        console.error('Ошибка:', error);
-        return [];
-    }
+    if (!response.ok) throw new Error('Ошибка при получении задач');
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Ошибка:', error);
+    showAlert('Не удалось загрузить задачи', 'error');
+    return [];
+  }
 }
 
 // Обновление списка задач на странице
 async function updateTasksList() {
-    try {
-        const tasksContainer = document.querySelector('.tasks-divs');
-        tasksContainer.innerHTML = '';
-
-        const tasks = await fetchTasks();
-        tasks.forEach(task => {
-            tasksContainer.appendChild(createTaskElement(task));
-        });
-    } catch (error) {
-        console.error('Ошибка при обновлении списка:', error);
+  try {
+    tasksContainer.innerHTML = '';
+    const tasks = await fetchTasks();
+    
+    if (tasks.length === 0) {
+      tasksContainer.innerHTML = '<p class="no-tasks">Нет задач для отображения</p>';
+      return;
     }
+    
+    tasks.forEach(task => {
+      tasksContainer.appendChild(createTaskElement(task));
+    });
+  } catch (error) {
+    console.error('Ошибка при обновлении списка:', error);
+  }
 }
 
-// Инициализация при загрузке страницы
-document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('add').addEventListener('click', addTask);
-    updateTasksList();
-});
+// Вспомогательные функции
+function getPriorityName(priority) {
+  const names = {
+    'Low': 'Низкий',
+    'Medium': 'Средний',
+    'High': 'Высокий',
+    'Critical': 'Критический'
+  };
+  return names[priority] || priority;
+}
+
+function getStatusName(status) {
+  const names = {
+    'Active': 'Активная',
+    'Completed': 'Выполнена',
+    'Overdue': 'Просрочена',
+    'Late': 'Завершена с опозданием'
+  };
+  return names[status] || status;
+}
+
+// Показать уведомление
+function showAlert(message, type) {
+  const alert = document.createElement('div');
+  alert.className = `alert alert--${type}`;
+  alert.textContent = message;
+  
+  document.body.appendChild(alert);
+  
+  setTimeout(() => {
+    alert.classList.add('alert--fade');
+    setTimeout(() => alert.remove(), 300);
+  }, 3000);
+}

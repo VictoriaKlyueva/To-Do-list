@@ -1,219 +1,331 @@
-/*  Подключение шрифтов */
-
-@font-face {
-    font-family: "InterRegular";
-    src: local("Inter"), 
-         local("Inter-Regular"), 
-         url("/assets/fonts/Inter-regular.woff2") format("woff2");
-}
-
-@font-face {
-    font-family: "InterMedium";
-    src: local("Inter"), 
-         local("Inter-Medium"), 
-         url("/assets/fonts/Inter-regular.woff2") format("woff2");
-}
-
-@font-face {
-    font-family: "InterLight";
-    src: local("Inter"), 
-         local("Inter-Light"), 
-         url("/assets/fonts/Inter-regular.woff2") format("woff2");
-}
-
-@font-face {
-    font-family: "InterBolditalic";
-    src: local("Inter"), 
-         local("Inter-Bolditalic"), 
-         url("/assets/fonts/Inter-regular.woff2") format("woff2");
-}
-
-@font-face {
-    font-family: "InterBold";
-    src: local("Inter"), 
-         local("Inter-Bold"), 
-         url("/assets/fonts/Inter-regular.woff2") format("woff2");
-}
-
-* {
+/* Общие стили */
+:root {
+    --primary-bg: #2A2B2F;
+    --secondary-bg: #24262C;
+    --card-bg: #292B31;
+    --accent-color: #4A90E2;
+    --text-color: #FFFFFF;
+    --text-secondary: #989CAA;
+    --border-color: #36373D;
+    --success-color: #4CAF50;
+    --warning-color: #FFC107;
+    --danger-color: #F44336;
+    --late-color: #FF9800;
+  }
+  
+  * {
     margin: 0;
     padding: 0;
-}
-
-body {
-    background: #2A2B2F;
-    background-repeat: no-repeat;
-    color: #ffffff;
-    font-family: "InterMedium";
-}
-
-p {
-    font-family: "InterBold";
-}
-
-p.tasks-list {
-    font-size: 28px;
-}
-
-p.taskName {
-    margin-left: 10px;
-}
-
-header {
-    background: #222327;
-    padding-top: 20px;
-    padding-bottom: 20px;
-    padding-left: 20px;
-    padding-right: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 40px;
-}
-
-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    width: 100%;
-    font-size: 18px;
-    padding: auto;
-    color: #989CAA;
-    border-radius: 30px;
-    font-family: "InterRegular";
-    border: 2px solid rgba(93, 90, 98, 1);
-    background-color: rgba(93, 90, 98, 1);
-}
-
-button:hover {
-    background: rgba(93, 90, 98, 0.5);
-    border-radius: 30px;
-    border: 2px solid rgba(255, 255, 255, 0.2);
-}
-
-button:active {
-    background: rgba(93, 90, 98, 0.75);
-    border-radius: 30px;
-    border: 2px solid rgba(255, 255, 255, 0.2);
-}
-
-button.add {
-    width: 120px;
-}
-
-button.delete {
-    width: 100px;
-}
-
-button.update {
-    width: 100px;
-}
-
-div.add-div {
-    margin-left: 15px;
-}
-
-img {
-    width: 100%;
-    height: 100%;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--primary-bg);
+    color: var(--text-color);
+    line-height: 1.6;
+  }
+  
+  /* Основная структура */
+  .app-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+  
+  .header {
+    background-color: #222327;
+    padding: 20px 0;
+    margin-bottom: 30px;
+  }
+  
+  .header__title {
+    font-size: 2.5rem;
+    text-align: center;
+    font-weight: 600;
+  }
+  
+  .main-content {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding-left: 35px;
-    margin: auto;
+    gap: 30px;
+  }
+  
+  /* Форма добавления задачи */
+  .task-form {
+    display: flex;
+    gap: 15px;
+    max-width: 800px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  
+  .task-form__input {
+    flex: 1;
+    padding: 12px 20px;
     border-radius: 30px;
-}
-
-div.new-task-field {
-    display: flex;
-    margin: 25px auto 5px;
-    width: 50%;
-    height: 50px;
-    text-align: justify;
-}
-
-div.task-description {
-    display: flex;
-    margin: 0px auto 5px;
-    width: 50%;
-    height: 50px;
-    padding-top: 20px;
-    text-align: justify;
-}
-
-div.tasks-list-container {
-    width: 70%;
-    height: 645px;
+    border: 2px solid var(--border-color);
+    background-color: var(--border-color);
+    color: var(--text-color);
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+  
+  .task-form__input:focus {
+    border-color: var(--accent-color);
+  }
+  
+  .task-form__button {
+    padding: 12px 25px;
+    border-radius: 30px;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .task-form__button:hover {
+    background-color: #3a7bc8;
+  }
+  
+  /* Секция с задачами */
+  .tasks-section {
+    background-color: var(--secondary-bg);
+    border-radius: 15px;
     padding: 30px;
-    margin: 50px auto 5px;
-    border-radius: 30px;
-    -webkit-border-radius: 30px;
-    -moz-border-radius: 30px;
-    -khtml-border-radius: 30px; 
-    background: #24262C;
-    border: 1px solid #24262C;
-}
-
-div.tasks-divs {
-    margin-top: 25px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .tasks-section__title {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    color: var(--text-color);
+  }
+  
+  .tasks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  /* Карточка задачи */
+  .task-card {
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    position: relative;
+  }
+  
+  .task-card--low {
+    border-left: 4px solid var(--success-color);
+  }
+  
+  .task-card--medium {
+    border-left: 4px solid var(--warning-color);
+  }
+  
+  .task-card--high {
+    border-left: 4px solid var(--danger-color);
+  }
+  
+  .task-card--critical {
+    border-left: 4px solid #d32f2f;
+  }
+  
+  .task-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .task-checkbox {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+  }
+  
+  .task-title {
+    font-size: 1.2rem;
+    font-weight: 500;
+    flex: 1;
+  }
+  
+  .task-description {
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+  
+  .task-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    font-size: 0.9rem;
+  }
+  
+  .task-deadline,
+  .task-priority,
+  .task-status {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .task-status--active {
+    color: var(--accent-color);
+  }
+  
+  .task-status--completed {
+    color: var(--success-color);
+  }
+  
+  .task-status--overdue {
+    color: var(--danger-color);
+  }
+  
+  .task-status--late {
+    color: var(--late-color);
+  }
+  
+  .task-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  
+  .task-button {
+    padding: 8px 15px;
+    border-radius: 20px;
+    border: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  
+  .task-button--edit {
+    background-color: var(--accent-color);
+    color: white;
+  }
+  
+  .task-button--edit:hover {
+    background-color: #3a7bc8;
+  }
+  
+  .task-button--delete {
+    background-color: var(--danger-color);
+    color: white;
+  }
+  
+  .task-button--delete:hover {
+    background-color: #d32f2f;
+  }
+  
+  /* Модальное окно */
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-}
-
-div.task-div {
-    display: flex;
-    height: 30px;;
-    margin-bottom: 10px;
-    padding: 10px;
-    background: #292B31;
-    border-radius: 30px;
-    -webkit-border-radius: 30px;
-    -moz-border-radius: 30px;
-    -khtml-border-radius: 30px;
-    justify-content: space-between;
-}
-
-div.task-info {
-    display: flex;
-    margin-left: 10px;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 100;
+    justify-content: center;
     align-items: center;
-    width: 70%;
-}
-
-div.filesManagement {
-    display: flex;
-    height: 50px;
-    margin: 25px auto 25px;
-    justify-content: space-between;
-    width: 30%;
-}
-
-div.save-div {
-    width: 150px;
-}
-
-div.upload-div {
-    width: 150px;
-}
-
-input[type="text"] {
-    border-radius: 30px;
-    -webkit-border-radius: 30px;
-    -moz-border-radius: 30px;
-    -khtml-border-radius: 30px; 
-    background: #36373D;
-    border: 1px solid #36373D; 
-    outline: none;
+  }
+  
+  .modal__content {
+    background-color: var(--secondary-bg);
+    border-radius: 10px;
     width: 100%;
-    color: #989CAA;
-    font-size: 18px;
-    padding-left: 1.5%;
-}
-
-input[type="text"].taskDescriptionText {
-    margin-left: 20px;
-    height: 110%;
-    padding-left: 10px;
-}
+    max-width: 500px;
+    padding: 25px;
+    position: relative;
+  }
+  
+  .modal__close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--text-secondary);
+  }
+  
+  .modal__title {
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+  }
+  
+  .edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .form-label {
+    font-weight: 500;
+  }
+  
+  .form-input,
+  .form-textarea,
+  .form-select {
+    padding: 10px 15px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background-color: var(--primary-bg);
+    color: var(--text-color);
+    font-family: inherit;
+  }
+  
+  .form-textarea {
+    min-height: 80px;
+    resize: vertical;
+  }
+  
+  .form-button {
+    padding: 12px;
+    border-radius: 6px;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 10px;
+  }
+  
+  .form-button:hover {
+    background-color: #3a7bc8;
+  }
+  
+  /* Адаптивность */
+  @media (max-width: 768px) {
+    .task-form {
+      flex-direction: column;
+    }
+    
+    .task-form__button {
+      width: 100%;
+    }
+    
+    .tasks-section {
+      padding: 20px;
+    }
+    
+    .task-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }

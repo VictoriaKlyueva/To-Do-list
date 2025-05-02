@@ -7,24 +7,56 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="site-header">
-    <div class="wrapper site-header__wrapper">
-      <h1 class="main-label">To-Do List</h1>
-    </div>
-  </header>
-  
-  <main>
-    <div class="new-task-field">
-      <input type="text" name="taskInput" placeholder="Название задачи" minlength="4" required>
-      <button id="add" class="add-btn">Добавить</button>
-    </div>
+  <div class="app-container">
+    <header class="header">
+      <h1 class="header__title">To-Do List</h1>
+    </header>
     
-    <div class="tasks-container">
-      <h2 class="tasks-title">Список задач</h2>
-      <div class="tasks-divs"></div>
+    <main class="main-content">
+      <div class="task-form">
+        <input type="text" class="task-form__input" placeholder="Название задачи" minlength="4" required>
+        <button id="add" class="task-form__button">Добавить</button>
+      </div>
+      
+      <div class="tasks-section">
+        <h2 class="tasks-section__title">Список задач</h2>
+        <div class="tasks-list" id="tasks-container"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Модальное окно редактирования -->
+  <div class="modal" id="edit-modal">
+    <div class="modal__content">
+      <span class="modal__close">&times;</span>
+      <h3 class="modal__title">Редактировать задачу</h3>
+      <form class="edit-form">
+        <div class="form-group">
+          <label class="form-label">Название:</label>
+          <input type="text" id="edit-title" class="form-input" minlength="4" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Описание:</label>
+          <textarea id="edit-description" class="form-textarea"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Дедлайн:</label>
+          <input type="datetime-local" id="edit-deadline" class="form-input">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Приоритет:</label>
+          <select id="edit-priority" class="form-select">
+            <option value="Low">Низкий</option>
+            <option value="Medium">Средний</option>
+            <option value="High">Высокий</option>
+            <option value="Critical">Критический</option>
+          </select>
+        </div>
+        <button type="button" id="save-changes" class="form-button">Сохранить</button>
+      </form>
     </div>
-  </main>
-  
+  </div>
+
   <script src="script.js"></script>
 </body>
 </html>
