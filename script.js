@@ -1,7 +1,6 @@
 const apiUrl = "http://localhost:5055/api/todo";
 let currentEditingTask = null;
 
-// DOM элементы
 const modal = document.getElementById('edit-modal');
 const taskInput = document.querySelector('.task-form__input');
 const tasksContainer = document.getElementById('tasks-container');
@@ -9,13 +8,12 @@ const addButton = document.getElementById('add');
 const saveButton = document.getElementById('save-changes');
 const closeButton = document.querySelector('.modal__close');
 
-// Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', () => {
   addButton.addEventListener('click', addTask);
   closeButton.addEventListener('click', closeModal);
   saveButton.addEventListener('click', saveTaskChanges);
   
-  // Закрытие модального окна при клике вне его
+  // Закрытие модального окна при клике не на него
   window.addEventListener('click', (event) => {
     if (event.target === modal) {
       closeModal();
@@ -25,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
   updateTasksList();
 });
 
-// Класс задачи
+
 class Task {
   constructor(title, description = "", deadline = null, priority = "Medium") {
     this.title = title;
@@ -37,76 +35,106 @@ class Task {
 
 // Создание элемента задачи
 function createTaskElement(task) {
-  const taskElement = document.createElement('div');
-  taskElement.className = `task-card task-card--${task.priority.toLowerCase()}`;
-  taskElement.dataset.id = task.id;
-
-  // Чекбокс выполнения
-  const checkbox = document.createElement('input');
-  checkbox.type = 'checkbox';
-  checkbox.className = 'task-checkbox';
-  checkbox.checked = task.status === 'Completed' || task.status === 'Late';
-  checkbox.addEventListener('change', () => toggleTaskCompletion(task));
-
-  // Заголовок задачи
-  const title = document.createElement('div');
-  title.className = 'task-title';
-  title.textContent = task.title;
-
-  // Описание задачи
-  const description = document.createElement('p');
-  description.className = 'task-description';
-  description.textContent = task.description || '';
-
-  // Мета-информация
-  const meta = document.createElement('div');
-  meta.className = 'task-meta';
-
-  // Дедлайн
-  const deadline = document.createElement('div');
-  deadline.className = 'task-deadline';
-  deadline.innerHTML = `<i class="far fa-calendar-alt"></i> ${task.deadline 
-    ? new Date(task.deadline).toLocaleString() 
-    : 'Без дедлайна'}`;
-
-  // Приоритет
-  const priority = document.createElement('div');
-  priority.className = 'task-priority';
-  priority.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${getPriorityName(task.priority)}`;
-
-  // Статус
-  const status = document.createElement('div');
-  status.className = `task-status task-status--${task.status.toLowerCase()}`;
-  status.innerHTML = `<i class="fas fa-info-circle"></i> ${getStatusName(task.status)}`;
-
-  // Кнопки действий
-  const actions = document.createElement('div');
-  actions.className = 'task-actions';
-
-  const editButton = document.createElement('button');
-  editButton.className = 'task-button task-button--edit';
-  editButton.innerHTML = '<i class="fas fa-edit"></i> Редактировать';
-  editButton.addEventListener('click', () => openEditModal(task));
-
-  const deleteButton = document.createElement('button');
-  deleteButton.className = 'task-button task-button--delete';
-  deleteButton.innerHTML = '<i class="fas fa-trash-alt"></i> Удалить';
-  deleteButton.addEventListener('click', () => deleteTask(task.id));
-
-  // Сборка элементов
-  meta.append(deadline, priority, status);
-  actions.append(editButton, deleteButton);
+    const taskElement = document.createElement('div');
+    
+    let statusClass = '';
+    const now = new Date();
+    const deadline = task.deadline ? new Date(task.deadline) : null;
+    
+    if (task.status === 'Completed' || task.status === 'Late') {
+      statusClass = 'task-status--completed';
+    } else if (deadline) {
+      const timeDiff = deadline - now;
+      const daysDiff = timeDiff / (1000 * 60 * 60 * 24);
+      
+      if (timeDiff <= 0) {
+        statusClass = 'task-status--overdue';
+      } else if (daysDiff < 3) {
+        statusClass = 'task-status--warning';
+      }
+    }
   
-  const header = document.createElement('div');
-  header.className = 'task-header';
-  header.append(checkbox, title);
+    taskElement.className = `task-card task-card--${task.priority.toLowerCase()} ${statusClass}`;
+    taskElement.dataset.id = task.id;
+  
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.className = 'task-checkbox';
+    checkbox.checked = task.status === 'Completed' || task.status === 'Late';
+    checkbox.addEventListener('change', () => toggleTaskCompletion(task));
+  
+    const title = document.createElement('div');
+    title.className = 'task-title';
+    title.textContent = task.title;
+  
+    const description = document.createElement('p');
+    description.className = 'task-description';
+    description.textContent = task.description || '';
+  
+    const meta = document.createElement('div');
+    meta.className = 'task-meta';
+  
+    const deadlineElement = document.createElement('div');
+    deadlineElement.className = 'task-deadline';
+    
+    if (task.deadline) {
+      const deadlineDate = new Date(task.deadline);
+      const timeLeft = getTimeLeftString(deadlineDate);
+      deadlineElement.innerHTML = `<i class="far fa-calendar-alt"></i> ${deadlineDate.toLocaleString()} (${timeLeft})`;
+    } else {
+      deadlineElement.innerHTML = '<i class="far fa-calendar-alt"></i> Без дедлайна';
+    }
+  
+    const priority = document.createElement('div');
+    priority.className = 'task-priority';
+    priority.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${getPriorityName(task.priority)}`;
+  
+    const status = document.createElement('div');
+    status.className = `task-status task-status--${task.status.toLowerCase()}`;
+    status.innerHTML = `<i class="fas fa-info-circle"></i> ${getStatusName(task.status)}`;
+  
+    const actions = document.createElement('div');
+    actions.className = 'task-actions';
+  
+    const editButton = document.createElement('button');
+    editButton.className = 'task-button task-button--edit';
+    editButton.innerHTML = '<i class="fas fa-edit"></i> Редактировать';
+    editButton.addEventListener('click', () => openEditModal(task));
+  
+    const deleteButton = document.createElement('button');
+    deleteButton.className = 'task-button task-button--delete';
+    deleteButton.innerHTML = '<i class="fas fa-trash-alt"></i> Удалить';
+    deleteButton.addEventListener('click', () => deleteTask(task.id));
+  
+    meta.append(deadlineElement, priority, status);
+    actions.append(editButton, deleteButton);
+    
+    const header = document.createElement('div');
+    header.className = 'task-header';
+    header.append(checkbox, title);
+  
+    taskElement.append(header, description, meta, actions);
+  
+    return taskElement;
+  }
+  
+  function getTimeLeftString(deadline) {
+    const now = new Date();
+    const diff = deadline - now;
+    
+    if (diff <= 0) return 'Просрочено';
+    
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    
+    if (days > 0) {
+      return `Осталось: ${days} д. ${hours} ч.`;
+    } else {
+      return `Осталось: ${hours} ч.`;
+    }
+  }
 
-  taskElement.append(header, description, meta, actions);
-
-  return taskElement;
-}
-
-// Открытие модального окна редактирования
+// Открытие модалки редактирования
 function openEditModal(task) {
   currentEditingTask = task;
   
@@ -120,7 +148,7 @@ function openEditModal(task) {
   modal.style.display = 'flex';
 }
 
-// Закрытие модального окна
+// Закрытие модалки
 function closeModal() {
   modal.style.display = 'none';
   currentEditingTask = null;
@@ -276,7 +304,6 @@ async function updateTasksList() {
   }
 }
 
-// Вспомогательные функции
 function getPriorityName(priority) {
   const names = {
     'Low': 'Низкий',
@@ -297,7 +324,6 @@ function getStatusName(status) {
   return names[status] || status;
 }
 
-// Показать уведомление
 function showAlert(message, type) {
   const alert = document.createElement('div');
   alert.className = `alert alert--${type}`;
