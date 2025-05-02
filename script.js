@@ -173,33 +173,52 @@ function saveTaskChanges() {
 
 // Добавление новой задачи
 async function addTask() {
-  const title = taskInput.value.trim();
-  
-  if (!title || title.length < 4) {
-    showAlert('Название задачи обязательно и должно содержать минимум 4 символа', 'error');
-    return;
-  }
-
-  try {
-    const newTask = new Task(title);
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(newTask)
-    });
-
-    if (!response.ok) throw new Error('Ошибка при создании задачи');
+    const titleInput = document.getElementById('task-title');
+    const descriptionInput = document.getElementById('task-description');
+    const deadlineInput = document.getElementById('task-deadline');
+    const priorityInput = document.getElementById('task-priority');
     
-    await updateTasksList();
-    taskInput.value = '';
-    showAlert('Задача успешно добавлена', 'success');
-  } catch (error) {
-    console.error('Ошибка:', error);
-    showAlert('Не удалось создать задачу', 'error');
+    const title = titleInput.value.trim();
+    const description = descriptionInput.value.trim();
+    const deadline = deadlineInput.value ? new Date(deadlineInput.value) : null;
+    const priority = priorityInput.value;
+    
+    if (!title || title.length < 4) {
+      showAlert('Название задачи обязательно и должно содержать минимум 4 символа', 'error');
+      titleInput.focus();
+      return;
+    }
+  
+    try {
+      const newTask = {
+        title,
+        description: description || null,
+        deadline,
+        priority
+      };
+      
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newTask)
+      });
+  
+      if (!response.ok) throw new Error('Ошибка при создании задачи');
+      
+      await updateTasksList();
+      titleInput.value = '';
+      descriptionInput.value = '';
+      deadlineInput.value = '';
+      priorityInput.value = 'Medium';
+      
+      showAlert('Задача успешно добавлена', 'success');
+    } catch (error) {
+      console.error('Ошибка:', error);
+      showAlert('Не удалось создать задачу', 'error');
+    }
   }
-}
 
 // Обновление задачи
 async function updateTask(id, updatedData) {

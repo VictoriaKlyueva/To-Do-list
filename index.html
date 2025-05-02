@@ -8,22 +8,40 @@
 </head>
 <body>
   <div class="app-container">
-    <header class="header">
-      <h1 class="header__title">To-Do List</h1>
+    <header>
+      <h1 class="header">Задорный To-Do List</h1>
     </header>
+
+  <main class="main-content">
+    <div class="task-form">
+      <div class="form-group">
+        <input type="text" class="task-form__input" id="task-title" placeholder="Название задачи*" minlength="4" required>
+      </div>
+      <div class="form-group">
+        <textarea class="task-form__textarea" id="task-description" placeholder="Описание"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <input type="datetime-local" class="task-form__date" id="task-deadline">
+        </div>
+        <div class="form-group">
+          <select class="task-form__select" id="task-priority">
+            <option value="Medium">Средний приоритет</option>
+            <option value="Low">Низкий приоритет</option>
+            <option value="High">Высокий приоритет</option>
+            <option value="Critical">Критический приоритет</option>
+          </select>
+        </div>
+      </div>
+      <button id="add" class="task-form__button">Добавить задачу</button>
+    </div>
     
-    <main class="main-content">
-      <div class="task-form">
-        <input type="text" class="task-form__input" placeholder="Название задачи" minlength="4" required>
-        <button id="add" class="task-form__button">Добавить</button>
-      </div>
-      
-      <div class="tasks-section">
-        <h2 class="tasks-section__title">Список задач</h2>
-        <div class="tasks-list" id="tasks-container"></div>
-      </div>
-    </main>
-  </div>
+    <div class="tasks-section">
+      <h2 class="tasks-section__title">Список задач</h2>
+      <div class="tasks-list" id="tasks-container"></div>
+    </div>
+  </main>
+</div>
 
   <!-- Модальное окно редактирования -->
   <div class="modal" id="edit-modal">
