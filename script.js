@@ -222,14 +222,10 @@ async function updateTask(id, updatedData) {
   }
 }
 
-// Переключение статуса выполнения
+// Переключение статуса
 async function toggleTaskCompletion(task) {
   try {
-    const endpoint = task.status === 'Completed' || task.status === 'Late' 
-      ? 'incomplete' 
-      : 'complete';
-    
-    const response = await fetch(`${apiUrl}/${endpoint}/${task.id}`, {
+    const response = await fetch(`${apiUrl}/toggle-completion/${task.id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
