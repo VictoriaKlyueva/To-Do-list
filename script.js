@@ -1,3 +1,5 @@
+let path = "http://localhost:5055";
+
 class Task {
     constructor(Description, IsCompleted=false) {
         this.Id;
@@ -64,7 +66,7 @@ function makeTaskDiv(task) {
 
 function changeFlag(task) {
     if (task.isCompleted) {
-        fetch('http://192.168.232.82:5259/api/todo/incomplete/' + task.id.toString(), {
+        fetch('http://localhost:5055/api/todo/incomplete/' + task.id.toString(), {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -83,7 +85,7 @@ function changeFlag(task) {
             console.error('Ошибка:', error);
         });
     } else {
-        fetch('http://192.168.232.82:5259/api/todo/complete/' + task.id.toString(), {
+        fetch('http://localhost:5055/api/todo/complete/' + task.id.toString(), {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -114,7 +116,7 @@ function addTask() {
     if (tasks.length < 10) {
         let newTask = new Task(taskName);
 
-        fetch('http://192.168.232.82:5259/api/todo', {
+        fetch('http://localhost:5055/api/todo', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -142,7 +144,7 @@ function addTask() {
 }
 
 function fetchTasks() {
-    return fetch('http://192.168.232.82:5259/api/todo', {
+    return fetch('http://localhost:5055/api/todo', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -176,7 +178,7 @@ function makeDivs() {
 function changeTaskDescription(id, description) {
     console.log(description);
     console.log(JSON.stringify({ DescriptionName: description }));
-    fetch('http://192.168.232.82:5259/api/todo/' + id.toString(), {
+    fetch('http://localhost:5055/api/todo/' + id.toString(), {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -213,7 +215,7 @@ function updateTasksList() {
 
 // Удаление элемента из списка
 function deleteTask(id) {
-    fetch('http://192.168.232.82:5259/api/todo/' + id.toString(), {
+    fetch('http://localhost:5055/api/todo/' + id.toString(), {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
