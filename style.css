@@ -381,3 +381,53 @@
       align-items: flex-start;
     }
   }
+
+  /* Фильтрации */
+  .tasks-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: var(--card-bg);
+    border-radius: 8px;
+  }
+  
+  .filter-control,
+  .sort-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .form-select {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background-color: var(--primary-bg);
+    color: var(--text-color);
+    font-family: inherit;
+  }
+  
+  .sort-direction {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+  }
+  
+  .sort-direction input {
+    margin: 0;
+  }
+  
+  @media (max-width: 768px) {
+    .tasks-controls {
+      flex-direction: column;
+      gap: 15px;
+    }
+    
+    .filter-control,
+    .sort-control {
+      flex-direction: column;
+      align-items: flex-start;
+    }

@@ -26,6 +26,7 @@
         </div>
         <div class="form-group">
           <select class="task-form__select" id="task-priority">
+            <option value="">Не выбрано</option>
             <option value="Medium">Средний приоритет</option>
             <option value="Low">Низкий приоритет</option>
             <option value="High">Высокий приоритет</option>
@@ -38,6 +39,35 @@
     
     <div class="tasks-section">
       <h2 class="tasks-section__title">Список задач</h2>
+
+      <div class="tasks-controls">
+        <div class="filter-control">
+          <label for="status-filter">Фильтр по статусу:</label>
+          <select id="status-filter" class="form-select">
+            <option value="">Все</option>
+            <option value="Active">Активные</option>
+            <option value="Completed">Выполненные</option>
+            <option value="Overdue">Просроченные</option>
+            <option value="Late">Завершённые с опозданием</option>
+          </select>
+        </div>
+        
+        <div class="sort-control">
+          <label for="sort-by">Сортировать по:</label>
+          <select id="sort-by" class="form-select">
+            <option value="deadline">Дедлайну</option>
+            <option value="priority">Приоритету</option>
+            <option value="title">Названию</option>
+            <option value="createdDate">Дате создания</option>
+          </select>
+          
+          <label class="sort-direction">
+            <input type="checkbox" id="sort-descending">
+            <span>По убыванию</span>
+          </label>
+        </div>
+      </div>
+
       <div class="tasks-list" id="tasks-container"></div>
     </div>
   </main>

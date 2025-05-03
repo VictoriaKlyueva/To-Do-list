@@ -7,6 +7,19 @@ const tasksContainer = document.getElementById('tasks-container');
 const addButton = document.getElementById('add');
 const saveButton = document.getElementById('save-changes');
 const closeButton = document.querySelector('.modal__close');
+const statusFilter = document.getElementById('status-filter');
+const sortBySelect = document.getElementById('sort-by');
+const sortDescending = document.getElementById('sort-descending');
+
+let currentFilters = {
+  status: '',
+  sortBy: 'deadline',
+  descending: true
+};
+
+statusFilter.value = currentFilters.status;
+sortBySelect.value = currentFilters.sortBy;
+sortDescending.checked = currentFilters.descending;
 
 document.addEventListener('DOMContentLoaded', () => {
   addButton.addEventListener('click', addTask);
@@ -20,6 +33,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
   
+  updateTasksList();
+});
+
+statusFilter.addEventListener('change', (e) => {
+  currentFilters.status = e.target.value;
+  updateTasksList();
+});
+
+sortBySelect.addEventListener('change', (e) => {
+  currentFilters.sortBy = e.target.value;
+  updateTasksList();
+});
+
+sortDescending.addEventListener('change', (e) => {
+  currentFilters.descending = e.target.checked;
   updateTasksList();
 });
 
@@ -181,7 +209,7 @@ async function addTask() {
     const title = titleInput.value.trim();
     const description = descriptionInput.value.trim();
     const deadline = deadlineInput.value ? new Date(deadlineInput.value) : null;
-    const priority = priorityInput.value;
+    const priority = priorityInput.value || null;
     
     if (!title || title.length < 4) {
       showAlert('Название задачи обязательно и должно содержать минимум 4 символа', 'error');
@@ -211,7 +239,7 @@ async function addTask() {
       titleInput.value = '';
       descriptionInput.value = '';
       deadlineInput.value = '';
-      priorityInput.value = 'Medium';
+      priorityInput.value = null;
       
       showAlert('Задача успешно добавлена', 'success');
     } catch (error) {
@@ -283,7 +311,17 @@ async function deleteTask(id) {
 // Получение списка задач
 async function fetchTasks() {
   try {
-    const response = await fetch(apiUrl, {
+    // Создаем URL с параметрами запроса
+    const url = new URL(apiUrl);
+    
+    if (currentFilters.status) {
+      url.searchParams.append('statusFilter', currentFilters.status);
+    }
+    
+    url.searchParams.append('sortBy', currentFilters.sortBy);
+    url.searchParams.append('descending', currentFilters.descending);
+    
+    const response = await fetch(url, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -307,7 +345,8 @@ async function updateTasksList() {
     const tasks = await fetchTasks();
     
     if (tasks.length === 0) {
-      tasksContainer.innerHTML = '<p class="no-tasks">Нет задач для отображения</p>';
+      // Плейсхолдер
+      tasksContainer.innerHTML = '<p class="no-tasks">Нет задач</p>';
       return;
     }
     
