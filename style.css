@@ -1,16 +1,16 @@
-/* Общие стили */
+/* Cтили */
 :root {
-    --primary-bg: #2A2B2F;
-    --secondary-bg: #24262C;
-    --card-bg: #292B31;
-    --accent-color: #4A90E2;
+    --primary-bg: #323338;
+    --secondary-bg: #282a30;
+    --card-bg: #37383d;
+    --accent-color: #52a9db;
     --text-color: #FFFFFF;
-    --text-secondary: #989CAA;
+    --text-secondary: #969aa7;
     --border-color: #36373D;
     --success-color: #4CAF50;
-    --warning-color: #FFC107;
-    --danger-color: #F44336;
-    --late-color: #FF9800;
+    --warning-color: #e9b006;
+    --red-color: #f5473b;
+    --orange-color: #f79c14;
   }
   
   * {
@@ -42,7 +42,7 @@
   }
   
   .header {
-    background-color: #222327;
+    background-color: var(--secondary-bg);
     padding: 20px 0;
     margin-bottom: 30px;
   }
@@ -112,7 +112,6 @@
   
   .task-form__select {
     appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23989CAA'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
     background-repeat: no-repeat;
     background-position: right 15px center;
     background-size: 20px;
@@ -183,7 +182,7 @@
   }
   
   .task-card--high {
-    border-left: 4px solid var(--danger-color);
+    border-left: 4px solid var(--red-color);
   }
   
   .task-card--critical {
@@ -227,21 +226,23 @@
     align-items: center;
     gap: 5px;
   }
-  
-  .task-status--active {
-    color: var(--accent-color);
+
+  /* Цвет индикатора (слева на карточке) */
+
+  .task-card--default {
+    border-left: 4px solid var(--border-color) !important;
   }
   
-  .task-status--completed {
-    color: var(--success-color);
+  .task-card--completed {
+    border-left: 4px solid var(--success-color) !important;
   }
   
-  .task-status--overdue {
-    color: var(--danger-color);
+  .task-card--overdue {
+    border-left: 4px solid var(--red-color) !important;
   }
   
-  .task-status--late {
-    color: var(--late-color);
+  .task-card--warning {
+    border-left: 4px solid var(--orange-color) !important;
   }
   
   .task-actions {
@@ -269,7 +270,7 @@
   }
   
   .task-button--delete {
-    background-color: var(--danger-color);
+    background-color: var(--red-color);
     color: white;
   }
   

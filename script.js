@@ -11,6 +11,7 @@ const statusFilter = document.getElementById('status-filter');
 const sortBySelect = document.getElementById('sort-by');
 const sortDescending = document.getElementById('sort-descending');
 
+// Филтры
 let currentFilters = {
   status: '',
   sortBy: 'deadline',
@@ -63,104 +64,111 @@ class Task {
 
 // Создание элемента задачи
 function createTaskElement(task) {
-    const taskElement = document.createElement('div');
-    
-    let statusClass = '';
-    const now = new Date();
-    const deadline = task.deadline ? new Date(task.deadline) : null;
-    
-    if (task.status === 'Completed' || task.status === 'Late') {
-      statusClass = 'task-status--completed';
-    } else if (deadline) {
+  const taskElement = document.createElement('div');
+  
+  let statusClass = 'task-card--default';
+  const now = new Date();
+  const deadline = task.deadline ? new Date(task.deadline) : null;
+  const createdDate = task.createdDate ? new Date(task.createdDate) : new Date();
+  
+  if (task.status === 'Completed' || task.status === 'Late') {
+      statusClass = 'task-card--completed';
+  } else if (deadline) {
       const timeDiff = deadline - now;
       const daysDiff = timeDiff / (1000 * 60 * 60 * 24);
       
       if (timeDiff <= 0) {
-        statusClass = 'task-status--overdue';
+          statusClass = 'task-card--overdue';
       } else if (daysDiff < 3) {
-        statusClass = 'task-status--warning';
+          statusClass = 'task-card--warning';
       }
-    }
+  }
   
-    taskElement.className = `task-card task-card--${task.priority.toLowerCase()} ${statusClass}`;
-    taskElement.dataset.id = task.id;
+  taskElement.className = `task-card ${statusClass}`;
+  taskElement.dataset.id = task.id;
+
+  // Остальные элементы остаются без изменений...
+  const checkbox = document.createElement('input');
+  checkbox.type = 'checkbox';
+  checkbox.className = 'task-checkbox';
+  checkbox.checked = task.status === 'Completed' || task.status === 'Late';
+  checkbox.addEventListener('change', () => toggleTaskCompletion(task));
+
+  const title = document.createElement('div');
+  title.className = 'task-title';
+  title.textContent = task.title;
+
+  const description = document.createElement('p');
+  description.className = 'task-description';
+  description.textContent = task.description || '';
+
+  const meta = document.createElement('div');
+  meta.className = 'task-meta';
+
+  const createdElement = document.createElement('div');
+  createdElement.className = 'task-created';
+  createdElement.innerHTML = `<i class="far fa-calendar-plus"></i> Создана: ${createdDate.toLocaleDateString()}`;
+
+  const deadlineElement = document.createElement('div');
+  deadlineElement.className = 'task-deadline';
   
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.className = 'task-checkbox';
-    checkbox.checked = task.status === 'Completed' || task.status === 'Late';
-    checkbox.addEventListener('change', () => toggleTaskCompletion(task));
-  
-    const title = document.createElement('div');
-    title.className = 'task-title';
-    title.textContent = task.title;
-  
-    const description = document.createElement('p');
-    description.className = 'task-description';
-    description.textContent = task.description || '';
-  
-    const meta = document.createElement('div');
-    meta.className = 'task-meta';
-  
-    const deadlineElement = document.createElement('div');
-    deadlineElement.className = 'task-deadline';
-    
-    if (task.deadline) {
+  if (task.deadline) {
       const deadlineDate = new Date(task.deadline);
       const timeLeft = getTimeLeftString(deadlineDate);
-      deadlineElement.innerHTML = `<i class="far fa-calendar-alt"></i> ${deadlineDate.toLocaleString()} (${timeLeft})`;
-    } else {
+      deadlineElement.innerHTML = `<i class="far fa-calendar-alt"></i> Дедлайн: ${deadlineDate.toLocaleString()} (${timeLeft})`;
+  } else {
       deadlineElement.innerHTML = '<i class="far fa-calendar-alt"></i> Без дедлайна';
-    }
-  
-    const priority = document.createElement('div');
-    priority.className = 'task-priority';
-    priority.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${getPriorityName(task.priority)}`;
-  
-    const status = document.createElement('div');
-    status.className = `task-status task-status--${task.status.toLowerCase()}`;
-    status.innerHTML = `<i class="fas fa-info-circle"></i> ${getStatusName(task.status)}`;
-  
-    const actions = document.createElement('div');
-    actions.className = 'task-actions';
-  
-    const editButton = document.createElement('button');
-    editButton.className = 'task-button task-button--edit';
-    editButton.innerHTML = '<i class="fas fa-edit"></i> Редактировать';
-    editButton.addEventListener('click', () => openEditModal(task));
-  
-    const deleteButton = document.createElement('button');
-    deleteButton.className = 'task-button task-button--delete';
-    deleteButton.innerHTML = '<i class="fas fa-trash-alt"></i> Удалить';
-    deleteButton.addEventListener('click', () => deleteTask(task.id));
-  
-    meta.append(deadlineElement, priority, status);
-    actions.append(editButton, deleteButton);
-    
-    const header = document.createElement('div');
-    header.className = 'task-header';
-    header.append(checkbox, title);
-  
-    taskElement.append(header, description, meta, actions);
-  
-    return taskElement;
   }
+
+  const priority = document.createElement('div');
+  priority.className = 'task-priority';
+  priority.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${getPriorityName(task.priority)}`;
+
+  const status = document.createElement('div');
+  status.className = `task-status task-status--${task.status.toLowerCase()}`;
+  status.innerHTML = `<i class="fas fa-info-circle"></i> ${getStatusName(task.status)}`;
+
+  const actions = document.createElement('div');
+  actions.className = 'task-actions';
+
+  const editButton = document.createElement('button');
+  editButton.className = 'task-button task-button--edit';
+  editButton.innerHTML = '<i class="fas fa-edit"></i> Редактировать';
+  editButton.addEventListener('click', () => openEditModal(task));
+
+  const deleteButton = document.createElement('button');
+  deleteButton.className = 'task-button task-button--delete';
+  deleteButton.innerHTML = '<i class="fas fa-trash-alt"></i> Удалить';
+  deleteButton.addEventListener('click', () => deleteTask(task.id));
+
+  // Добавляем createdElement в meta
+  meta.append(createdElement, deadlineElement, priority, status);
+  actions.append(editButton, deleteButton);
   
-  function getTimeLeftString(deadline) {
-    const now = new Date();
-    const diff = deadline - now;
-    
-    if (diff <= 0) return 'Просрочено';
-    
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    
-    if (days > 0) {
-      return `Осталось: ${days} д. ${hours} ч.`;
-    } else {
-      return `Осталось: ${hours} ч.`;
-    }
+  const header = document.createElement('div');
+  header.className = 'task-header';
+  header.append(checkbox, title);
+
+  taskElement.append(header, description, meta, actions);
+
+  return taskElement;
+}
+  
+function getTimeLeftString(deadline) {
+  const now = new Date();
+  const diff = deadline - now;
+  
+  if (diff <= 0) return 'Просрочено';
+  
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  
+  if (days > 0) {
+    return `Осталось: ${days} д. ${hours} ч.`;
+  } else {
+    return `Осталось: ${hours} ч.`;
   }
+}
 
 // Открытие модалки редактирования
 function openEditModal(task) {
@@ -311,7 +319,6 @@ async function deleteTask(id) {
 // Получение списка задач
 async function fetchTasks() {
   try {
-    // Создаем URL с параметрами запроса
     const url = new URL(apiUrl);
     
     if (currentFilters.status) {
