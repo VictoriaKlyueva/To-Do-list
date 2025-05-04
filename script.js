@@ -62,7 +62,7 @@ class Task {
   }
 }
 
-// Создание элемента задачи
+// Отрисовка элемента задачи
 function createTaskElement(task) {
   const taskElement = document.createElement('div');
   
@@ -74,12 +74,14 @@ function createTaskElement(task) {
   if (task.status === 'Completed' || task.status === 'Late') {
       statusClass = 'task-card--completed';
   } else if (deadline) {
+
       const timeDiff = deadline - now;
       const daysDiff = timeDiff / (1000 * 60 * 60 * 24);
       
       if (timeDiff <= 0) {
           statusClass = 'task-card--overdue';
-      } else if (daysDiff < 3) {
+      }
+      else if (daysDiff < 3) {
           statusClass = 'task-card--warning';
       }
   }
@@ -87,7 +89,6 @@ function createTaskElement(task) {
   taskElement.className = `task-card ${statusClass}`;
   taskElement.dataset.id = task.id;
 
-  // Остальные элементы остаются без изменений...
   const checkbox = document.createElement('input');
   checkbox.type = 'checkbox';
   checkbox.className = 'task-checkbox';
@@ -114,7 +115,7 @@ function createTaskElement(task) {
   
   if (task.deadline) {
       const deadlineDate = new Date(task.deadline);
-      const timeLeft = getTimeLeftString(deadlineDate);
+      const timeLeft = getLeftTime(deadlineDate);
       deadlineElement.innerHTML = `<i class="far fa-calendar-alt"></i> Дедлайн: ${deadlineDate.toLocaleString()} (${timeLeft})`;
   } else {
       deadlineElement.innerHTML = '<i class="far fa-calendar-alt"></i> Без дедлайна';
@@ -141,7 +142,6 @@ function createTaskElement(task) {
   deleteButton.innerHTML = '<i class="fas fa-trash-alt"></i> Удалить';
   deleteButton.addEventListener('click', () => deleteTask(task.id));
 
-  // Добавляем createdElement в meta
   meta.append(createdElement, deadlineElement, priority, status);
   actions.append(editButton, deleteButton);
   
@@ -154,14 +154,14 @@ function createTaskElement(task) {
   return taskElement;
 }
   
-function getTimeLeftString(deadline) {
+function getLeftTime(deadline) {
   const now = new Date();
   const diff = deadline - now;
   
   if (diff <= 0) return 'Просрочено';
   
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const days = Math.floor(diff / (60 * 60 * 24 * 1000));
+  const hours = Math.floor((diff % (60 * 60 * 24 * 1000)) / (1000 * 60 * 60));
   
   if (days > 0) {
     return `Осталось: ${days} д. ${hours} ч.`;
@@ -177,10 +177,8 @@ function openEditModal(task) {
   document.getElementById('edit-title').value = task.title;
   document.getElementById('edit-description').value = task.description || '';
   document.getElementById('edit-deadline').value = task.deadline 
-    ? new Date(task.deadline).toISOString().slice(0, 16) 
-    : '';
+    ? new Date(task.deadline).toISOString().slice(0, 16)  : '';
   document.getElementById('edit-priority').value = task.priority;
-  
   modal.style.display = 'flex';
 }
 
@@ -198,11 +196,9 @@ function saveTaskChanges() {
     title: document.getElementById('edit-title').value,
     description: document.getElementById('edit-description').value,
     deadline: document.getElementById('edit-deadline').value 
-      ? new Date(document.getElementById('edit-deadline').value)
-      : null,
+      ? new Date(document.getElementById('edit-deadline').value) : null,
     priority: document.getElementById('edit-priority').value
   };
-  
   updateTask(currentEditingTask.id, updatedTask);
   closeModal();
 }
@@ -213,14 +209,12 @@ async function addTask() {
     const descriptionInput = document.getElementById('task-description');
     const deadlineInput = document.getElementById('task-deadline');
     const priorityInput = document.getElementById('task-priority');
-    
     const title = titleInput.value.trim();
     const description = descriptionInput.value.trim();
     const deadline = deadlineInput.value ? new Date(deadlineInput.value) : null;
     const priority = priorityInput.value || null;
     
-    if (!title || title.length < 4) {
-      showAlert('Название задачи обязательно и должно содержать минимум 4 символа', 'error');
+    if (title.length < 4 || title === null) {
       titleInput.focus();
       return;
     }
@@ -241,7 +235,8 @@ async function addTask() {
         body: JSON.stringify(newTask)
       });
   
-      if (!response.ok) throw new Error('Ошибка при создании задачи');
+      if (!response.ok) 
+        throw new Error('Ошибка при создании задачи');
       
       await updateTasksList();
       titleInput.value = '';
@@ -249,10 +244,8 @@ async function addTask() {
       deadlineInput.value = '';
       priorityInput.value = null;
       
-      showAlert('Задача успешно добавлена', 'success');
     } catch (error) {
       console.error('Ошибка:', error);
-      showAlert('Не удалось создать задачу', 'error');
     }
   }
 
@@ -267,13 +260,12 @@ async function updateTask(id, updatedData) {
       body: JSON.stringify(updatedData)
     });
 
-    if (!response.ok) throw new Error('Ошибка при обновлении задачи');
+    if (!response.ok) 
+      throw new Error('Ошибка при обновлении задачи');
     
     await updateTasksList();
-    showAlert('Задача успешно обновлена', 'success');
   } catch (error) {
     console.error('Ошибка:', error);
-    showAlert('Не удалось обновить задачу', 'error');
   }
 }
 
@@ -287,12 +279,12 @@ async function toggleTaskCompletion(task) {
       }
     });
 
-    if (!response.ok) throw new Error('Ошибка при изменении статуса');
+    if (!response.ok) 
+      throw new Error('Ошибка при изменении статуса');
     
     await updateTasksList();
   } catch (error) {
     console.error('Ошибка:', error);
-    showAlert('Не удалось изменить статус задачи', 'error');
   }
 }
 
@@ -306,13 +298,12 @@ async function deleteTask(id) {
       }
     });
 
-    if (!response.ok) throw new Error('Ошибка при удалении задачи');
+    if (!response.ok) 
+      throw new Error('Ошибка при удалении задачи');
     
     await updateTasksList();
-    showAlert('Задача успешно удалена', 'success');
   } catch (error) {
     console.error('Ошибка:', error);
-    showAlert('Не удалось удалить задачу', 'error');
   }
 }
 
@@ -320,7 +311,6 @@ async function deleteTask(id) {
 async function fetchTasks() {
   try {
     const url = new URL(apiUrl);
-    
     if (currentFilters.status) {
       url.searchParams.append('statusFilter', currentFilters.status);
     }
@@ -340,7 +330,6 @@ async function fetchTasks() {
     return await response.json();
   } catch (error) {
     console.error('Ошибка:', error);
-    showAlert('Не удалось загрузить задачи', 'error');
     return [];
   }
 }
@@ -383,17 +372,4 @@ function getStatusName(status) {
     'Late': 'Завершена с опозданием'
   };
   return names[status] || status;
-}
-
-function showAlert(message, type) {
-  const alert = document.createElement('div');
-  alert.className = `alert alert--${type}`;
-  alert.textContent = message;
-  
-  document.body.appendChild(alert);
-  
-  setTimeout(() => {
-    alert.classList.add('alert--fade');
-    setTimeout(() => alert.remove(), 300);
-  }, 3000);
 }
